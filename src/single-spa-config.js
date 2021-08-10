@@ -21,6 +21,7 @@ const runScript = async (url) => {
 const getManifest = (url, bundle) => new Promise(async (resolve) => {
     const { data } = await axios.get(url);
     const { entrypoints, publicPath } = data;
+    console.log('publicPath: ', publicPath);
     const assets = entrypoints[bundle].assets;
     for (let i = 0; i < assets.length; i++) {
         await runScript(publicPath + assets[i]).then(() => {
@@ -44,8 +45,48 @@ singleSpa.registerApplication( //注册微前端服务
         });
         return singleVue;
     },
-    location => location.pathname.startsWith('/vue') // 配置微前端模块前缀
+    location => location.pathname.startsWith('/') // 配置微前端模块前缀
 );
+
+/** 匹配路由 */
+const pathPrefix = (prefix) => {
+    return (location) => location.pathname.startsWith(prefix);
+}
+
+/** 获取构建后生成的资源清单asset-manifest.json */
+const fetchAssets = (url, bundle) => {
+    console.log('url: ', url);
+    return new Promise(async (resolve) => {
+        const mainfest = 'manifest.json';
+        const { data } = await axios.get(`${url}/${mainfest}?version=${Date.now()}`);
+        const { entrypoints, publicPath } = data;
+        console.log('publicPath: ', publicPath);
+        resolve(entrypoints[bundle].assets.filter(s => /\^*.(js|css)$/.test(s)).map((item) => `${publicPath}${item}`));
+    });
+}
+
+/** 根据路由加载子应用 */
+const applicationOrLoadingFn = async (url, appName) => {
+    /** 获取mainfest */
+    const files = await fetchAssets(url, 'app');
+    console.log('files: ', files);
+    const JSList = files.filter(s => /\^*.js$/.test(s));
+    console.log('JSList: ', JSList);
+    await Promise.all(JSList.map((file) => axios.get(`${url}${file}?version=${Date.now()}`))).then(res => {
+        res.forEach(r => {
+            console.log('r.data: ', r.data);
+            // new Function(r.data)();
+            window.eval(r.data) // 或者eval.call(null, r.data)
+        })
+    })
+    return window[appName];
+}
+
+// singleSpa.registerApplication( //注册微前端服务
+//     'singleDemo',
+//     ({ name }) => applicationOrLoadingFn('http://127.0.0.1:3000', name),
+//     pathPrefix('/') // 配置微前端模块前缀
+// );
 
 singleSpa.registerApplication(
     'reactApp',
