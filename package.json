@@ -2,7 +2,7 @@
   "name": "nfeng-vue-single-spa",
   "version": "0.1.0",
   "scripts": {
-    "serve-spa": "vue-cli-service serve",
+    "serve": "vue-cli-service serve",
     "build": "vue-cli-service build"
   },
   "dependencies": {
@@ -10,7 +10,6 @@
     "axios": "^0.19.0",
     "core-js": "^3.3.2",
     "create-react-app": "^3.2.0",
-    "nfeng-navbar": "^1.0.1",
     "single-spa": "^4.4.1",
     "single-spa-vue": "^1.5.4",
     "systemjs": "^6.1.4",

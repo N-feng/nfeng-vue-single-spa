@@ -4,7 +4,9 @@ import router from './router'
 import Ant from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
 import './single-spa-config.js'
+import bus from './utils/bus'
 
+window.myBus = bus
 Vue.config.productionTip = false;
 Vue.use(Ant);
 
