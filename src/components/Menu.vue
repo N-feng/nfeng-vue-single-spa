@@ -19,17 +19,18 @@
         <span>viteApp</span>
       </div>
     </a-menu-item>
-    <a-menu-item key="login">
+    <!-- <a-menu-item key="login">
       <div @click="handleLink({url: '/login'})">
         <a-icon type="user" />
         <span>Login</span>
       </div>
-    </a-menu-item>
+    </a-menu-item> -->
   </a-menu>
 </template>
 
 <script>
 import SubMenu from './SubMenu.vue'
+import { navigateToUrl } from 'single-spa';
 
 /**
  * @description 判读是否为外链
@@ -49,6 +50,12 @@ export default {
     }
   },
   methods: {
+    goToChildRoute(e) {
+      console.log('e: ', e);
+      // 官方指定跳转
+      e.preventDefault();
+      navigateToUrl(e);
+    },
     handleLink(item) {
       const routePath = item.url;
       const target = item.target;
